@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm'
+import { Entity, Index, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm'
 import { Post } from './Post';
 import { User } from './User';
 
@@ -9,12 +9,18 @@ export enum ActivityType {
 }
 
 @Entity()
+@Index("idx_feed_user_type_created_id", ["userId", "type", "createdAt", "id"], { 
+    unique: false,
+})
 export class Activity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   postId: string | null;
+  
+  @Column()
+  userId: string;
 
   @Column({
     type: 'enum',
@@ -34,8 +40,10 @@ export class Activity {
   @ManyToOne(() => User, (user) => user.activities)
   user: User;
 
-  constructor(type: ActivityType, user: User) {
+  constructor(type: ActivityType, user: User, post: Post | null) {
     this.type = type;
     this.user = user;
+    this.userId = user.id;
+    this.postId = post ? post.id : null;
   }
 }
