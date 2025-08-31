@@ -1,4 +1,11 @@
 import { DataSource } from 'typeorm';
+import { User } from '../models/User';
+import { Activity } from '../models/Activity';
+import { Post } from '../models/Post';
+import dotenv from 'dotenv';
+import path from 'node:path';
+
+dotenv.config(); 
 
 const AppDataSource = new DataSource({
   type: 'mysql',
@@ -7,9 +14,11 @@ const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  synchronize: true,
-  // logging: true,
-  // entities: [User, Artist, AccessLog, Track, Album, Favorite],
+  synchronize: false,
+  logging: false,
+  entities: [User, Activity, Post],
+  migrations: [path.join(__dirname, '../migrations/*.ts')],
+  subscribers: [],
 });
 
 export default AppDataSource;
